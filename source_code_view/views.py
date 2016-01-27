@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from .models import Greeting
 import urllib2
 import httplib
 import re
@@ -33,20 +32,16 @@ def search(request):
             return render(request, 'index.html', {'error': 'HTTP error',
                                                   'data': e,
                                                   'url': url})
-            # checksLogger.error('HTTPError = ' + str(e.code))
         except urllib2.URLError, e:
-            # checksLogger.error('URLError = ' + str(e.reason))
             return render(request, 'index.html', {'error': 'URL error',
                                                   'data': e,
                                                   'url': url})
         except httplib.HTTPException, e:
-            # checksLogger.error('HTTPException')
             return render(request, 'index.html', {'error': 'HTTP exception error',
                                                   'data': e,
                                                   'url': url})
         except Exception:
             import traceback
-            # checksLogger.error('generic exception: ' + traceback.format_exc())
             return render(request, 'index.html', {'error': 'general error',
                                                   'data': traceback.format_exc(),
                                                   'url': url})

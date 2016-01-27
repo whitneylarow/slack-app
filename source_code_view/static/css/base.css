@@ -1,0 +1,31 @@
+.jumbotron {
+    background: #532f8c;
+    color: white;
+    padding-bottom: 80px
+}
+
+.jumbotron p {
+    color: #d9ccee;
+    max-width: 75%;
+    margin: 1em auto 2em
+}
+.navbar+.jumbotron {
+    margin-top: -20px
+}
+#sourceCode {
+     white-space: pre-wrap;
+}
+
+p.error {
+    font-size: 16px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    height: 24px;
+    overflow: hidden;
+}
+
+.no-content {
+    color: #cccccc;
+    font-size: 100px;
+    text-align: center;
+}
