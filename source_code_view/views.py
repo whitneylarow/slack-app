@@ -1,12 +1,29 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from HTMLParser import HTMLParser
 
 import urllib2
 import httplib
 import re
 
+
 def index(request):
     return render(request, 'index.html')
+
+class SourceCodeParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.counts = {}
+        self.commentData = ''
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.counts:
+            self.counts[tag] += 1
+        else:
+            self.counts[tag] = 1
+
+    def handle_comment(self, data):
+        self.commentData += data
 
 
 def search(request):
@@ -16,17 +33,12 @@ def search(request):
         try: 
             response = urllib2.urlopen(url)
             html = response.read()
-            tags = re.findall('<([^/!<>\s]+)[^<>]*>', html)
-            counts = {}
-            for tag in tags:
-                if tag in counts:
-                    counts[tag] += 1
-                else:
-                    counts[tag] = 1
+            parser = SourceCodeParser()
+            parser.feed(html)
+            parser.feed(parser.commentData)
             result = {'url': url,
                       'html': html,
-                      'tags': tags,
-                      'counts': counts}
+                      'counts': parser.counts}
             return render(request, 'index.html', result)
         except urllib2.HTTPError, e:
             return render(request, 'index.html', {'error': 'HTTP error',

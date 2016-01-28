@@ -1,5 +1,6 @@
 // Original JavaScript code by Chirp Internet: www.chirp.com.au
 // Please acknowledge use of this code by including this header.
+
 // Some edits made my Whitney LaRow to highlight HTML tags.
 
 function Hilitor(id, tag)
@@ -55,6 +56,8 @@ function Hilitor(id, tag)
   };
 
   // recursively apply word highlighting
+  // Edited to work for HTML tags only (don't highlight 
+  // tags found in quotes or scripts)
   this.hiliteWords = function(node)
   {
     if(node === undefined || !node) return;
@@ -62,24 +65,36 @@ function Hilitor(id, tag)
     if(skipTags.test(node.nodeName)) return;
 
     if(node.hasChildNodes()) {
-      for(var i=0; i < node.childNodes.length; i++)
+      for(var i=0; i < node.childNodes.length; i++) {
         this.hiliteWords(node.childNodes[i]);
+      }
     }
     if(node.nodeType == 3) { // NODE_TEXT
       if((nv = node.nodeValue) && (regs = matchRegex.exec(nv))) {
-        if(!wordColor[regs[0].toLowerCase()]) {
-          wordColor[regs[0].toLowerCase()] = colors[colorIdx++ % colors.length];
+        tag = regs[1];
+        if(!wordColor[tag.toLowerCase()]) {
+          wordColor[tag.toLowerCase()] = colors[colorIdx++ % colors.length];
         }
 
-        var match = document.createElement(hiliteTag);
-        match.appendChild(document.createTextNode(regs[0]));
-        match.style.backgroundColor = wordColor[regs[0].toLowerCase()];
-        match.style.fontStyle = "inherit";
-        match.style.color = "#000";
+        var after = node.splitText(regs.index + 1);
+        var afterText = after.nodeValue.substring(tag.length);
+        var countScriptTag = (afterText.match(/<script[\s>]/g) || []).length;
+        var countEndScriptTag = (afterText.match(/<\/script>/g) || []).length;
 
-        var after = node.splitText(regs.index);
-        after.nodeValue = after.nodeValue.substring(regs[0].length);
-        node.parentNode.insertBefore(match, after);
+        // Unless we're actually highlighting the script tag, we should
+        // see the same number of open and close script tags ahead.
+        if (tag == 'script' && countScriptTag != countEndScriptTag ||
+            tag != 'script' && countScriptTag == countEndScriptTag) {
+          after.nodeValue = after.nodeValue.substring(tag.length);
+
+          var match = document.createElement(hiliteTag);
+          match.appendChild(document.createTextNode(tag));
+          match.style.backgroundColor = wordColor[tag.toLowerCase()];
+          match.style.fontStyle = "inherit";
+          match.style.color = "#000";
+
+          node.parentNode.insertBefore(match, after);
+        }
       }
     };
   };
