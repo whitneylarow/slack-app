@@ -5,6 +5,7 @@ This is the repo for a Heroku web application that fetches and display source co
 For more specifications, see Slack's [Application Engineer Coding Exercise](https://slack-files.com/T024BE7LD-F0BPHNBAR-67ccd61806).
 
 Implementation nuances:
+
 1. Tags included in the count:
     * Beginning tags
     * Tags within comments
